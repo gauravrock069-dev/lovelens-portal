@@ -66,7 +66,10 @@ export default function AdminUpload({ gallery, onUploaded }: { gallery: GalleryW
       });
       await putBlob(p.thumb.uploadUrl, img.thumb, "image/jpeg");
       await putBlob(p.preview.uploadUrl, img.preview, "image/jpeg");
-      await putBlob(p.original.uploadUrl, file, file.type, (pct) => patch(id, { progress: pct }));
+      const isMock = p.original.uploadUrl.startsWith("/api/mock-upload");
+      const originalBody = isMock && file.size > 3.5 * 1024 * 1024 ? img.preview : file;
+      const originalType = originalBody === file ? file.type : "image/jpeg";
+      await putBlob(p.original.uploadUrl, originalBody, originalType, (pct) => patch(id, { progress: pct }));
       await postJson("/api/admin/photos", {
         galleryId: gallery.id,
         photos: [{
