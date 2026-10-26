@@ -10,7 +10,10 @@ import { PHOTOGRAPHER_PHONE } from "@/lib/constants";
 import { cn, formatDate } from "@/lib/utils";
 import type { GalleryWithStats } from "@/lib/types";
 
-const linkFor = (g: GalleryWithStats) => `${window.location.origin}/gallery/${g.slug}`;
+const linkFor = (g: GalleryWithStats) => {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  return `${origin}/gallery/${g.slug}`;
+};
 const inviteText = (g: GalleryWithStats) => {
   const phoneNote = PHOTOGRAPHER_PHONE ? `\n\nContact WhatsApp: +${PHOTOGRAPHER_PHONE}` : "";
   return `Hello ${g.client_name}! Your gallery from Love Lens Wedding is ready.\n\nLink: ${linkFor(g)}\nPIN: ${g.pin_code}\n\nTap the heart on the photos you want in your album, then send your selection to us on WhatsApp.${phoneNote}`;
