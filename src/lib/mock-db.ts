@@ -52,7 +52,7 @@ type Schema = {
   pin_attempts: StoredPinAttempt[];
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = process.env.VERCEL ? path.join("/tmp", "data") : path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "mock-db.json");
 const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 
@@ -64,6 +64,14 @@ function ensureDirs() {
 function readData(): Schema {
   ensureDirs();
   if (!fs.existsSync(DB_FILE)) {
+    const seedFile = path.join(process.cwd(), "data", "mock-db.json");
+    if (fs.existsSync(seedFile)) {
+      try {
+        const seed = fs.readFileSync(seedFile, "utf8");
+        fs.writeFileSync(DB_FILE, seed, "utf8");
+        return JSON.parse(seed) as Schema;
+      } catch {}
+    }
     const initial: Schema = { galleries: [], photos: [], selections: [], pin_attempts: [] };
     fs.writeFileSync(DB_FILE, JSON.stringify(initial, null, 2), "utf8");
     return initial;
